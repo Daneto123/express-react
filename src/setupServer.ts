@@ -9,12 +9,15 @@ import HTTP_STATUS from 'http-status-codes';
 import { Server } from 'socket.io';
 import { createClient } from 'redis';
 import { createAdapter } from '@socket.io/redis-adapter';
+import Logger from 'bunyan'; //log info, error
 import 'express-async-errors';
-import { config } from './config';
-import applicationRoutes from './routes';
-import { CustomError, IErrorResponse } from './shared/helpers/error-handler';
+import { config } from '@root/config';
+import applicationRoutes from '@root/routes';
+import { CustomError, IErrorResponse } from '@root/shared/globals/helpers/error-handler';
 
 const SERVER_PORT = 3001;
+
+const log: Logger = config.createLogger('server');
 
 export class ChattyServer {
     private app: Application;
@@ -80,7 +83,7 @@ export class ChattyServer {
             const socketIO: Server = await this.createSocketIO(httpServer);
             this.startHttpSever(httpServer);
         } catch (error) {
-            console.log(error);
+            log.error(error);
         }
     }
 
@@ -99,12 +102,14 @@ export class ChattyServer {
     }
 
     private startHttpSever(httpServer: http.Server): void {
-        console.log(`Server has started with process ${process.pid}`);
+        log.info(`Server has started with process ${process.pid}`);
         httpServer.listen(SERVER_PORT, () => {
             console.log(`Server running on port ${SERVER_PORT}`);
         });
     }
 
-    private socketIOConnections(io: Server): void {}
+    private socketIOConnections(io: Server): void {
+      log.info('socketIOConnection');
+    }
 
 }
